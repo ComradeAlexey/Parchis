@@ -63,8 +63,14 @@ public class GameManager : MonoBehaviour
 
     public GameObject winPanel;
     public Text winText;
+
+    public GameObject scorePrefab;
+    public Rect contentScroll;
+    public ScrollRect scrollRect;
+    public List<GameObject> scoreObjects;
     void Start()
     {
+        scrollRect.gameObject.SetActive(false);
         foreach (Cell cell in homeCells)
         {
             cell.idPlayer = -1;
@@ -335,12 +341,28 @@ public class GameManager : MonoBehaviour
         {
             cell.GhostChip.gameObject.SetActive(false);
         }
+        foreach (Cell cell in finalCells1)
+        {
+            cell.GhostChip.gameObject.SetActive(false);
+        }
+        foreach (Cell cell in finalCells2)
+        {
+            cell.GhostChip.gameObject.SetActive(false);
+        }
+        foreach (Cell cell in finalCells3)
+        {
+            cell.GhostChip.gameObject.SetActive(false);
+        }
+        foreach (Cell cell in finalCells4)
+        {
+            cell.GhostChip.gameObject.SetActive(false);
+        }
     }
 
     public void DeleteCubes()
     {
-        
-        
+
+
         //CheckSix();
         Destroy(cubes[0].gameObject);
         Destroy(cubes[1].gameObject);
@@ -355,6 +377,23 @@ public class GameManager : MonoBehaviour
             return;
         }
         buttonStepTwo.SetActive(true);
+        scrollRect.gameObject.SetActive(true);
+        scrollRect.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 200);
+        scrollRect.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, players[idThisPlayer].Scores.Length * 100);
+        if(players[idThisPlayer].Scores.Length <= 2)
+            scrollRect.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 100);
+        else
+            scrollRect.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 120);
+        int index = 0;
+        foreach (var item in players[idThisPlayer].Scores)
+        {
+            GameObject scoreGO = Instantiate(scorePrefab, scrollRect.content.gameObject.transform);
+            //scoreGO.GetComponent<RectTransform>().anchoredPosition.Set(0,(index++) * 100);
+
+            scoreGO.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, ((index++) * -100) - 100);
+            scoreGO.transform.Find("Text").GetComponent<Text>().text = item.ToString();
+            scoreObjects.Add(scoreGO);
+        }
     }
 
     public IEnumerator MoveChipFromTo(Transform chip, Transform from, Transform to, Chip _chip)
@@ -379,7 +418,7 @@ public class GameManager : MonoBehaviour
             GameObject gO = Instantiate(cubePrefab);
             cubes[i] = gO.GetComponent<Cube>();
             cubes[i].idCube = i;
-            cubes[i].scoreBoard = ScoresBoards[i];
+            //cubes[i].scoreBoard = ScoresBoards[i];
             cubes[i].gameManager = this;
             gO.transform.position = spawnPointsCubes[i].position;
         }
@@ -400,6 +439,7 @@ public class GameManager : MonoBehaviour
         buttonStepOne.SetActive(true);
         buttonStepTwo.SetActive(false);
         AllCubesSleep = 0;
+        scrollRect.gameObject.SetActive(false);
     }
 
     public void SkipStep()

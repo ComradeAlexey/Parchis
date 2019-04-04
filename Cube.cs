@@ -36,7 +36,7 @@ public class Cube : MonoBehaviour {
             CheckWall(transform.position, transform.right * -1, out hit, 2);
             CheckWall(transform.position, transform.forward, out hit, 6);
             CheckWall(transform.position, transform.forward * -1, out hit, 1);
-            scoreBoard.text = num + "";
+            //scoreBoard.text = num + "";
             gameManager.players[gameManager.idThisPlayer].AddScore(num);
             if(num == 6)
             {

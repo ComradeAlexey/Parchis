@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
     public Chip[] chips = new Chip[5];
@@ -38,6 +39,7 @@ public class Player : MonoBehaviour {
     {
         public EnemyCoordBase[] enemyCoordBase;
     }
+
     public void CreatePlayer(int localIdPlayer, string namePlayer, Color colorPlayer, GameManager gameManager, Transform baseCoordinates, EnemyCoordBase[] _enemyCoordBases)
     {
         for(int i = 0; i < 3;i++)
@@ -130,8 +132,14 @@ public class Player : MonoBehaviour {
 
     public void AddScore(int score)
     {
+        //Debug.Break();
         Array.Resize(ref Scores, Scores.Length + 1);
         Scores[Scores.Length - 1] = score;
+        
+        //scoreGO.transform.localPosition = new scoreGO.transform.localPosition.x, -(Scores.Length * 100 + 50), scoreGO.transform.localPosition.z);
+        //Rect rect = GameManager.contentScroll;
+        //GameManager.contentScroll.Set(rect.x, rect.y, rect.width, rect.height + 100);
+        //GameManager.contentScroll.GetComponent<RectTransform>().rect.Set(rect.x,rect.y,rect.width,rect.height);
     }
     public void DeleteScore(int indexScore)
     {
@@ -145,12 +153,57 @@ public class Player : MonoBehaviour {
         {
             Array.Resize(ref Scores, 0);
         }
+
+        //GameManager.scrollRect.gameObject.SetActive(true);
+        
+        if(Scores.Length == 0)
+        {
+            GameManager.scrollRect.gameObject.SetActive(false);
+        }
+        if (Scores.Length == 1)
+        {
+            GameManager.scrollRect.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 100);
+            GameManager.scrollRect.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 100);
+        }
+        else if (Scores.Length == 2)
+        {
+            GameManager.scrollRect.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 100);
+            GameManager.scrollRect.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 200);
+        }
+        else
+        {
+            GameManager.scrollRect.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 120);
+            GameManager.scrollRect.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 200);
+        }
+        GameManager.scrollRect.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Scores.Length * 100);
+        int index = 0;
+        foreach (var item in GameManager.scoreObjects)
+        {
+            Destroy(item);
+        }
+        GameManager.scoreObjects.Clear();
+        foreach (var item in Scores)
+        {
+            GameObject scoreGO = Instantiate(GameManager.scorePrefab, GameManager.scrollRect.content.gameObject.transform);
+            //scoreGO.GetComponent<RectTransform>().anchoredPosition.Set(0,(index++) * 100);
+
+            scoreGO.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, ((index++) * -100) - 100);
+            scoreGO.transform.Find("Text").GetComponent<Text>().text = item.ToString();
+            GameManager.scoreObjects.Add(scoreGO);
+        }
+        GameManager.scrollRect.verticalScrollbar.value = 1;
     }
 
     public void CleanData()
     {
+
         Scores = new int[0];
         numSteps = 0;
         indexSixScore = 0;
+        foreach (var item in GameManager.scoreObjects)
+        {
+            Destroy(item);
+        }
+        GameManager.scoreObjects.Clear();
     }
 }

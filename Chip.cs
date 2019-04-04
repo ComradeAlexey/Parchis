@@ -72,6 +72,13 @@ public class Chip : MonoBehaviour {
     {
         for (int i = 0; i < player.Scores.Length; i++)
         {
+            if (cell.isFinalCell)
+            {
+                player.DeleteScore(i);
+                return;
+            }
+            else
+            { 
             if (cell.idCell - (player.Scores[i] + indexCell) == 0 & !cell.isStartCell)
             {
                 player.DeleteScore(i);
@@ -90,9 +97,9 @@ public class Chip : MonoBehaviour {
                 player.DeleteScore(i);
                 return;
             }
-            else if (thisCell != null)
+            else if (thisCell != null & cell.isAngleCell)
             {
-                if (cell.isAngleCell & thisCell.isAngleCell)
+                if (thisCell.isAngleCell)
                 {
                     for (int j = 0; j < 2; j++)
                     {
@@ -111,7 +118,6 @@ public class Chip : MonoBehaviour {
                         }
                     }
                 }
-
             }
             else if (player.Scores[i] == 6 & cell.isStartCell)
             {
@@ -124,6 +130,12 @@ public class Chip : MonoBehaviour {
                 gameManager.players[indexEnemyPlayer].AddScore(6);
                 return;
             }
+            else if ((cell.idCell + 1) - (player.Scores[i] + indexCell) == 0 & !cell.isStartCell & cell.isHomeCell)
+            {
+                player.DeleteScore(i);
+                return;
+            }
+        }
         }
     }
 
@@ -142,12 +154,13 @@ public class Chip : MonoBehaviour {
         if(cell.isFinalCell)
         {
             isOnFinalCell = true;
+            isOnField = false;
         }
         if(isOnEnemyBase)
         {
             isOnEnemyBase = false;
         }
-        else if(!isOnField)
+        else if(!isOnField & !isOnFinalCell)
         {
             isOnField = true;
         }
@@ -301,7 +314,7 @@ public class Chip : MonoBehaviour {
                                     }
                                 }
                                 if (sumChip == 0)
-                                {   if (indexCell < player.idCellToFinalCell & sum >= player.idCellToFinalCell)
+                                {   if (indexCell < player.idCellToFinalCell & ReturnScorer()[i] + indexCell >= player.idCellToFinalCell)
                                     {
                                         player.finalCells[indexChip].GhostChip.gameObject.SetActive(true);
                                     }
