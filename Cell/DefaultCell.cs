@@ -1,7 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class DefaultCell : Cell {
+﻿public class DefaultCell : Cell {
 
 }
